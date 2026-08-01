@@ -3,11 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simulasi Iklim 3D - Presisi Garis Lintang Negara</title>
+  <title>Simulasi Iklim 3D - Micro Minimalist UI</title>
   <style>
     :root {
       --bg-color: #030712;
-      --card-bg: rgba(15, 23, 42, 0.88);
       --accent: #38bdf8;
       --text: #f8fafc;
       --text-muted: #94a3b8;
@@ -48,186 +47,200 @@
       pointer-events: none;
     }
 
-    /* Header Utama */
+    /* Header Utama Micro */
     .header-overlay {
       position: absolute;
-      top: 25px;
-      left: 30px;
+      top: 15px;
+      left: 20px;
       pointer-events: auto;
-      background: var(--card-bg);
-      padding: 14px 22px;
-      border-radius: 8px;
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(56, 189, 248, 0.3);
-      box-shadow: 0 0 25px rgba(0,0,0,0.8);
+      padding: 0;
+      background: transparent;
     }
 
     .header-overlay h1 {
-      font-size: 1.05rem;
+      font-size: 0.85rem;
       color: var(--accent);
-      letter-spacing: 1px;
+      letter-spacing: 1.2px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 6px;
       text-transform: uppercase;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.9);
+      font-weight: 700;
     }
 
     .header-overlay h1::before {
       content: "";
       display: inline-block;
-      width: 8px;
-      height: 8px;
+      width: 5px;
+      height: 5px;
       background: var(--accent);
       border-radius: 50%;
-      box-shadow: 0 0 10px var(--accent);
+      box-shadow: 0 0 6px var(--accent);
       animation: headerPulse 1.5s infinite alternate;
     }
 
     .header-overlay p {
-      font-size: 0.78rem;
+      font-size: 0.65rem;
       color: var(--text-muted);
-      margin-top: 4px;
+      margin-top: 2px;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.9);
     }
 
-    /* Navigation Bar */
+    /* Navigation Bar Micro */
     .nav-overlay {
       position: absolute;
-      bottom: 25px;
-      left: 30px;
+      bottom: 15px;
+      left: 20px;
       pointer-events: auto;
       display: flex;
-      gap: 10px;
-      background: var(--card-bg);
-      padding: 8px 12px;
-      border-radius: 30px;
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      gap: 6px;
+      background: transparent;
     }
 
     .btn {
-      background: rgba(51, 65, 85, 0.5);
+      background: rgba(15, 23, 42, 0.5);
       color: var(--text);
-      border: 1px solid transparent;
-      padding: 8px 18px;
-      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 5px 12px;
+      border-radius: 12px;
       cursor: pointer;
       font-weight: 600;
-      font-size: 0.82rem;
-      letter-spacing: 0.5px;
-      transition: all 0.3s ease;
+      font-size: 0.68rem;
+      letter-spacing: 0.4px;
+      transition: all 0.25s ease;
+      backdrop-filter: blur(4px);
+      text-shadow: 0 1px 2px rgba(0,0,0,0.8);
     }
 
     .btn:hover {
-      background: rgba(71, 85, 105, 0.8);
+      background: rgba(56, 189, 248, 0.25);
+      border-color: var(--accent);
     }
 
-    .btn[data-zone="tropis"].active { border-color: #ef4444; background: rgba(239, 68, 68, 0.25); color: #fca5a5; box-shadow: 0 0 12px rgba(239, 68, 68, 0.4); }
-    .btn[data-zone="subtropis"].active { border-color: #f97316; background: rgba(249, 115, 22, 0.25); color: #fdba74; box-shadow: 0 0 12px rgba(249, 115, 22, 0.4); }
-    .btn[data-zone="sedang"].active { border-color: #eab308; background: rgba(234, 179, 8, 0.25); color: #fde047; box-shadow: 0 0 12px rgba(234, 179, 8, 0.4); }
-    .btn[data-zone="dingin"].active { border-color: #3b82f6; background: rgba(59, 130, 246, 0.25); color: #93c5fd; box-shadow: 0 0 12px rgba(59, 130, 246, 0.4); }
+    .btn[data-zone="tropis"].active { border-color: #ef4444; background: rgba(239, 68, 68, 0.35); color: #fca5a5; box-shadow: 0 0 8px rgba(239, 68, 68, 0.3); }
+    .btn[data-zone="subtropis"].active { border-color: #f97316; background: rgba(249, 115, 22, 0.35); color: #fdba74; box-shadow: 0 0 8px rgba(249, 115, 22, 0.3); }
+    .btn[data-zone="sedang"].active { border-color: #eab308; background: rgba(234, 179, 8, 0.35); color: #fde047; box-shadow: 0 0 8px rgba(234, 179, 8, 0.3); }
+    .btn[data-zone="dingin"].active { border-color: #3b82f6; background: rgba(59, 130, 246, 0.35); color: #93c5fd; box-shadow: 0 0 8px rgba(59, 130, 246, 0.3); }
 
-    /* Panel Info Kanan */
+    /* Panel Informasi Kanan: TEKS DIPERKECIL LAGI & RINGKAS */
     .info-panel {
       position: absolute;
-      right: 30px;
-      top: 25px;
-      width: 380px;
-      max-height: calc(100vh - 50px);
-      background: var(--card-bg);
-      backdrop-filter: blur(16px);
-      border-radius: 12px;
-      padding: 22px;
+      right: 20px; 
+      top: 15px;
+      width: 260px; /* Ukuran panel jauh lebih ringkas */
+      max-height: calc(100vh - 30px);
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      backdrop-filter: none;
+      padding: 0;
       pointer-events: auto;
-      box-shadow: 0 0 35px rgba(0,0,0,0.8);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-left: 4px solid var(--accent);
-      transition: border-color 0.4s ease;
       overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;     
+      text-align: right;          
     }
 
     .info-header {
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      margin-bottom: 18px;
-      border-bottom: 1px solid rgba(255,255,255,0.12);
-      padding-bottom: 14px;
+      align-items: flex-end;
+      gap: 2px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      padding-bottom: 8px;
+      width: 100%;
     }
 
     .info-title {
-      font-size: 1.3rem;
+      font-size: 0.95rem; /* Judul diperkecil */
       font-weight: 700;
-      letter-spacing: 0.5px;
-      white-space: nowrap;
+      letter-spacing: 0.4px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.95);
     }
 
     .latitude-badge {
-      font-size: 0.85rem;
+      font-size: 0.68rem; /* Badge diperkecil */
       font-weight: 500;
       color: var(--text-muted);
-      letter-spacing: 0.5px;
+      letter-spacing: 0.2px;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.95);
     }
 
-    /* Kotak Info Negara Diklik dengan Layout Rapi */
+    /* Detail Koordinat Ultra Ringkas */
     .country-coords-box {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px dashed rgba(56, 189, 248, 0.35);
-      border-radius: 8px;
-      padding: 12px;
-      margin-top: 8px;
+      background: transparent;
+      border: none;
+      padding: 2px 0;
+      margin-top: 2px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      font-size: 0.82rem;
+      gap: 3px;
+      font-size: 0.68rem;
+      width: 100%;
+      align-items: flex-end;
     }
 
-    /* Grid layout agar titik dua (: ) tepat sejajar vertikal */
     .info-row {
       display: grid;
-      grid-template-columns: 135px 12px 1fr;
+      grid-template-columns: 1fr 8px 95px;
       align-items: center;
+      width: 100%;
     }
 
     .info-row .label {
       color: var(--text-muted);
+      text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+      text-align: right;
+      font-size: 0.65rem;
     }
 
     .info-row .colon {
       color: var(--accent);
       font-weight: bold;
+      text-align: center;
+      font-size: 0.65rem;
     }
 
     .info-row .value {
       color: #fff;
       font-weight: 600;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+      text-align: left;
+      font-size: 0.68rem;
     }
 
     .section-title {
-      font-size: 0.72rem;
+      font-size: 0.62rem; /* Judul sub-seksi diperkecil */
       text-transform: uppercase;
-      letter-spacing: 1.2px;
-      color: var(--text-muted);
-      margin-top: 16px;
-      margin-bottom: 10px;
+      letter-spacing: 1px;
+      color: var(--accent);
+      margin-top: 8px;
+      margin-bottom: 4px;
       font-weight: 700;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.95);
+      width: 100%;
     }
 
     .features-list {
       list-style-type: none;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 5px;
       padding-left: 0;
+      width: 100%;
     }
 
     .features-list li {
-      font-size: 0.85rem;
-      line-height: 1.45;
+      font-size: 0.68rem; /* Ukuran isi teks karakteristik diperkecil */
+      line-height: 1.3;
       color: #e2e8f0;
       opacity: 0;
-      transform: translateX(12px);
-      transition: all 0.35s ease;
+      transform: translateX(8px);
+      transition: all 0.25s ease;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.95);
     }
 
     .features-list li.visible {
@@ -235,30 +248,34 @@
       transform: translateX(0);
     }
 
-    /* Interactive Country Buttons */
+    /* Tag Tombol Negara Mungil */
     .country-tags {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 6px;
+      justify-content: flex-end;
+      gap: 5px;
+      margin-top: 3px;
+      width: 100%;
     }
 
     .country-tag {
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      padding: 7px 14px;
-      border-radius: 6px;
-      font-size: 0.82rem;
-      color: #f1f5f9;
+      background: rgba(15, 23, 42, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.68rem; /* Tombol negara lebih ringkas */
+      color: #cbd5e1;
       cursor: pointer;
       opacity: 0;
-      transform: translateY(8px);
-      transition: all 0.25s ease;
+      transform: translateY(5px);
+      transition: all 0.2s ease;
       user-select: none;
+      backdrop-filter: blur(4px);
+      text-shadow: 0 1px 2px rgba(0,0,0,0.9);
     }
 
     .country-tag:hover {
-      background: rgba(56, 189, 248, 0.2);
+      background: rgba(56, 189, 248, 0.25);
       border-color: var(--accent);
       color: #fff;
     }
@@ -268,7 +285,8 @@
       color: #030712;
       font-weight: 700;
       border-color: var(--accent);
-      box-shadow: 0 0 12px var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+      text-shadow: none;
     }
 
     .country-tag.visible {
@@ -276,7 +294,7 @@
       transform: translateY(0);
     }
 
-    /* Penanda Radar Berkedip */
+    /* Penanda Radar Berkedip Mungil */
     .blink-marker-container {
       position: absolute;
       width: 0;
@@ -287,19 +305,19 @@
     }
 
     .blink-marker-pin {
-      width: 10px;
-      height: 10px;
+      width: 7px;
+      height: 7px;
       background-color: var(--accent);
       border-radius: 50%;
       position: absolute;
       transform: translate(-50%, -50%);
-      box-shadow: 0 0 12px var(--accent);
+      box-shadow: 0 0 10px var(--accent);
     }
 
     .blink-marker-ring {
-      width: 36px;
-      height: 36px;
-      border: 2px solid var(--accent);
+      width: 26px;
+      height: 26px;
+      border: 1.5px solid var(--accent);
       border-radius: 50%;
       position: absolute;
       transform: translate(-50%, -50%);
@@ -308,29 +326,30 @@
 
     .blink-marker-label {
       position: absolute;
-      top: 10px;
+      top: 6px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(15, 23, 42, 0.92);
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(4px);
       border: 1px solid var(--accent);
       color: #fff;
-      padding: 3px 10px;
+      padding: 2px 6px;
       border-radius: 4px;
-      font-size: 0.72rem;
+      font-size: 0.62rem;
       white-space: nowrap;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.6);
       font-weight: 600;
     }
 
     @keyframes radarPulse {
       0% {
-        width: 10px;
-        height: 10px;
+        width: 7px;
+        height: 7px;
         opacity: 1;
       }
       100% {
-        width: 46px;
-        height: 46px;
+        width: 36px;
+        height: 36px;
         opacity: 0;
       }
     }
@@ -343,11 +362,24 @@
     @media (max-width: 768px) {
       .info-panel {
         top: auto;
-        bottom: 80px;
+        bottom: 70px;
         left: 15px;
         right: 15px;
         width: auto;
-        max-height: 40vh;
+        align-items: flex-start;
+        text-align: left;
+      }
+      .info-header, .country-coords-box {
+        align-items: flex-start;
+      }
+      .info-row {
+        grid-template-columns: 90px 8px 1fr;
+      }
+      .info-row .label {
+        text-align: left;
+      }
+      .country-tags {
+        justify-content: flex-start;
       }
       .header-overlay {
         left: 15px;
@@ -357,7 +389,6 @@
       .nav-overlay {
         bottom: 15px;
         left: 15px;
-        transform: none;
         width: auto;
         overflow-x: auto;
       }
@@ -373,7 +404,7 @@
   <div id="webgl-container"></div>
 
   <div id="ui-layer">
-    <!-- Header -->
+    <!-- Header Utama -->
     <div class="header-overlay">
       <h1>SIMULASI IKLIM BUMI 3D</h1>
       <p>Globe tetap berputar dengan penanda akurat & batas garis lintang negara.</p>
@@ -392,7 +423,7 @@
         <div class="info-title" id="climate-name">Iklim Tropis</div>
         <div class="latitude-badge" id="climate-lat">Zona Lintang: 0° - 23,5° LU / LS</div>
         
-        <!-- Info Negara & Koordinat Lintang dengan Format Sejajar -->
+        <!-- Detail Info Rata Kanan Sejajar -->
         <div class="country-coords-box" id="country-coords-box">
           <div class="info-row">
             <span class="label">Negara Terpilih</span>
@@ -414,12 +445,12 @@
       <div class="country-tags" id="climate-countries"></div>
     </div>
 
-    <!-- Navigation Bar -->
+    <!-- Navigation Bar (Teks Diubah Menjadi 'Dingin') -->
     <div class="nav-overlay">
       <button class="btn active" data-zone="tropis">Tropis</button>
       <button class="btn" data-zone="subtropis">Subtropis</button>
       <button class="btn" data-zone="sedang">Sedang</button>
-      <button class="btn" data-zone="dingin">Dingin / Kutub</button>
+      <button class="btn" data-zone="dingin">Dingin</button>
     </div>
   </div>
 
@@ -481,7 +512,7 @@
         ]
       },
       dingin: {
-        name: "Iklim Dingin / Kutub",
+        name: "Iklim Dingin", // Judul diganti menjadi 'Iklim Dingin'
         lat: "Zona Lintang: 66,5° - 90° LU / LS",
         color: "#3b82f6",
         features: [
@@ -534,7 +565,7 @@
       earthGroup = new THREE.Group();
       scene.add(earthGroup);
 
-      // Sphere Globe Utama (Polos Tanpa Blok Warna)
+      // Sphere Globe Utama
       const textureLoader = new THREE.TextureLoader();
       const earthTexture = textureLoader.load('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg');
 
@@ -549,8 +580,8 @@
       createLatitudeLineWithLabel(-23.5, "23.5° LS (Tropis)");
       createLatitudeLineWithLabel(35, "35.0° LU (Subtropis)");
       createLatitudeLineWithLabel(-35, "35.0° LS (Subtropis)");
-      createLatitudeLineWithLabel(66.5, "66.5° LU (Kutub)");
-      createLatitudeLineWithLabel(-66.5, "66.5° LS (Kutub)");
+      createLatitudeLineWithLabel(66.5, "66.5° LU (Dingin)");
+      createLatitudeLineWithLabel(-66.5, "66.5° LS (Dingin)");
 
       window.addEventListener('resize', onWindowResize);
 
@@ -579,22 +610,22 @@
       return new THREE.Vector3(x, y, z);
     }
 
-    // Canvas Label 2D untuk Teks 3D Garis Lintang
+    // Canvas Label 2D Transparan untuk Teks 3D Garis Lintang
     function createTextSprite(text) {
       const canvas = document.createElement('canvas');
       canvas.width = 256;
       canvas.height = 64;
       const ctx = canvas.getContext('2d');
 
-      ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.6)';
       ctx.strokeStyle = '#38bdf8';
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 1.5;
       ctx.beginPath();
       ctx.roundRect(10, 10, 236, 44, 8);
       ctx.fill();
       ctx.stroke();
 
-      ctx.font = 'Bold 20px Segoe UI, sans-serif';
+      ctx.font = 'Bold 18px Segoe UI, sans-serif';
       ctx.fillStyle = '#ffffff';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -603,7 +634,7 @@
       const texture = new THREE.CanvasTexture(canvas);
       const spriteMaterial = new THREE.SpriteMaterial({ map: texture, transparent: true });
       const sprite = new THREE.Sprite(spriteMaterial);
-      sprite.scale.set(1.6, 0.4, 1);
+      sprite.scale.set(1.4, 0.35, 1);
 
       return sprite;
     }
@@ -628,7 +659,7 @@
       }
 
       geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-      const material = new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.5 });
+      const material = new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.45 });
       earthGroup.add(new THREE.Line(geometry, material));
 
       // Pasang Label di Sisi Depan dan Belakang Globe
@@ -652,7 +683,7 @@
       const label = document.getElementById('marker-label');
 
       pin.style.backgroundColor = color;
-      pin.style.boxShadow = `0 0 15px ${color}`;
+      pin.style.boxShadow = `0 0 10px ${color}`;
       ring.style.borderColor = color;
       label.style.borderColor = color;
       label.textContent = labelName;
@@ -675,9 +706,6 @@
       activeTimeouts.forEach(t => clearTimeout(t));
       activeTimeouts = [];
 
-      const infoPanel = document.getElementById('info-panel');
-      infoPanel.style.borderColor = data.color;
-
       const titleEl = document.getElementById('climate-name');
       titleEl.style.color = data.color;
       titleEl.textContent = data.name;
@@ -695,7 +723,7 @@
 
         activeTimeouts.push(setTimeout(() => {
           li.classList.add('visible');
-        }, 80 + idx * 100));
+        }, 50 + idx * 70));
       });
 
       // Render Tombol-Tombol Negara Interaktif
@@ -707,7 +735,6 @@
         if (idx === selectedCountryIndex) tag.classList.add('active');
         tag.textContent = country.name;
 
-        // Klik Negara -> Globe Tetap Berputar, Menampilkan Koordinat Lintang Akurat
         tag.addEventListener('click', () => {
           document.querySelectorAll('.country-tag').forEach(t => t.classList.remove('active'));
           tag.classList.add('active');
@@ -720,7 +747,7 @@
 
         activeTimeouts.push(setTimeout(() => {
           tag.classList.add('visible');
-        }, 350 + idx * 60));
+        }, 200 + idx * 40));
       });
 
       // Set default negara pertama saat kategori diubah

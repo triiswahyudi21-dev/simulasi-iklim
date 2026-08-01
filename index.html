@@ -47,14 +47,15 @@
       pointer-events: none;
     }
 
-    /* Header Utama Micro */
+    /* Header Utama Dipindah ke Kanan Atas */
     .header-overlay {
       position: absolute;
       top: 15px;
-      left: 20px;
+      right: 20px;
       pointer-events: auto;
       padding: 0;
       background: transparent;
+      text-align: right;
     }
 
     .header-overlay h1 {
@@ -63,13 +64,14 @@
       letter-spacing: 1.2px;
       display: flex;
       align-items: center;
+      justify-content: flex-end;
       gap: 6px;
       text-transform: uppercase;
       text-shadow: 0 2px 4px rgba(0,0,0,0.9);
       font-weight: 700;
     }
 
-    .header-overlay h1::before {
+    .header-overlay h1::after {
       content: "";
       display: inline-block;
       width: 5px;
@@ -87,11 +89,11 @@
       text-shadow: 0 1px 3px rgba(0,0,0,0.9);
     }
 
-    /* Navigation Bar Micro */
+    /* Navigation Bar Micro (Bawah Kanan) */
     .nav-overlay {
       position: absolute;
       bottom: 15px;
-      left: 20px;
+      right: 20px;
       pointer-events: auto;
       display: flex;
       gap: 6px;
@@ -123,12 +125,12 @@
     .btn[data-zone="sedang"].active { border-color: #eab308; background: rgba(234, 179, 8, 0.35); color: #fde047; box-shadow: 0 0 8px rgba(234, 179, 8, 0.3); }
     .btn[data-zone="dingin"].active { border-color: #3b82f6; background: rgba(59, 130, 246, 0.35); color: #93c5fd; box-shadow: 0 0 8px rgba(59, 130, 246, 0.3); }
 
-    /* Panel Informasi Kanan: TEKS DIPERKECIL LAGI & RINGKAS */
+    /* PANEL INFORMASI DIPINDAH KE SEBELAH KIRI */
     .info-panel {
       position: absolute;
-      right: 20px; 
+      left: 20px; 
       top: 15px;
-      width: 260px; /* Ukuran panel jauh lebih ringkas */
+      width: 260px;
       max-height: calc(100vh - 30px);
       background: transparent;
       border: none;
@@ -139,14 +141,14 @@
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      align-items: flex-end;     
-      text-align: right;          
+      align-items: flex-start; /* Rata kiri */
+      text-align: left;        /* Rata kiri */
     }
 
     .info-header {
       display: flex;
       flex-direction: column;
-      align-items: flex-end;
+      align-items: flex-start;
       gap: 2px;
       margin-bottom: 10px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.12);
@@ -155,21 +157,21 @@
     }
 
     .info-title {
-      font-size: 0.95rem; /* Judul diperkecil */
+      font-size: 0.95rem;
       font-weight: 700;
       letter-spacing: 0.4px;
       text-shadow: 0 2px 4px rgba(0,0,0,0.95);
     }
 
     .latitude-badge {
-      font-size: 0.68rem; /* Badge diperkecil */
+      font-size: 0.68rem;
       font-weight: 500;
       color: var(--text-muted);
       letter-spacing: 0.2px;
       text-shadow: 0 1px 3px rgba(0,0,0,0.95);
     }
 
-    /* Detail Koordinat Ultra Ringkas */
+    /* Detail Koordinat Rata Kiri */
     .country-coords-box {
       background: transparent;
       border: none;
@@ -180,12 +182,12 @@
       gap: 3px;
       font-size: 0.68rem;
       width: 100%;
-      align-items: flex-end;
+      align-items: flex-start;
     }
 
     .info-row {
       display: grid;
-      grid-template-columns: 1fr 8px 95px;
+      grid-template-columns: 100px 8px 1fr;
       align-items: center;
       width: 100%;
     }
@@ -193,7 +195,7 @@
     .info-row .label {
       color: var(--text-muted);
       text-shadow: 0 1px 3px rgba(0,0,0,0.9);
-      text-align: right;
+      text-align: left;
       font-size: 0.65rem;
     }
 
@@ -213,7 +215,7 @@
     }
 
     .section-title {
-      font-size: 0.62rem; /* Judul sub-seksi diperkecil */
+      font-size: 0.62rem;
       text-transform: uppercase;
       letter-spacing: 1px;
       color: var(--accent);
@@ -234,11 +236,11 @@
     }
 
     .features-list li {
-      font-size: 0.68rem; /* Ukuran isi teks karakteristik diperkecil */
+      font-size: 0.68rem;
       line-height: 1.3;
       color: #e2e8f0;
       opacity: 0;
-      transform: translateX(8px);
+      transform: translateX(-8px); /* Animasi muncul dari kiri */
       transition: all 0.25s ease;
       text-shadow: 0 1px 3px rgba(0,0,0,0.95);
     }
@@ -248,11 +250,11 @@
       transform: translateX(0);
     }
 
-    /* Tag Tombol Negara Mungil */
+    /* Tag Tombol Negara Rata Kiri */
     .country-tags {
       display: flex;
       flex-wrap: wrap;
-      justify-content: flex-end;
+      justify-content: flex-start;
       gap: 5px;
       margin-top: 3px;
       width: 100%;
@@ -263,7 +265,7 @@
       border: 1px solid rgba(255, 255, 255, 0.12);
       padding: 3px 8px;
       border-radius: 4px;
-      font-size: 0.68rem; /* Tombol negara lebih ringkas */
+      font-size: 0.68rem;
       color: #cbd5e1;
       cursor: pointer;
       opacity: 0;
@@ -362,33 +364,37 @@
     @media (max-width: 768px) {
       .info-panel {
         top: auto;
-        bottom: 70px;
+        bottom: 65px;
         left: 15px;
         right: 15px;
         width: auto;
-        align-items: flex-start;
-        text-align: left;
-      }
-      .info-header, .country-coords-box {
-        align-items: flex-start;
-      }
-      .info-row {
-        grid-template-columns: 90px 8px 1fr;
-      }
-      .info-row .label {
-        text-align: left;
-      }
-      .country-tags {
-        justify-content: flex-start;
       }
       .header-overlay {
         left: 15px;
-        right: 15px;
+        right: auto;
         top: 15px;
+        text-align: left;
+      }
+      .header-overlay h1 {
+        justify-content: flex-start;
+      }
+      .header-overlay h1::after {
+        display: none;
+      }
+      .header-overlay h1::before {
+        content: "";
+        display: inline-block;
+        width: 5px;
+        height: 5px;
+        background: var(--accent);
+        border-radius: 50%;
+        box-shadow: 0 0 6px var(--accent);
+        animation: headerPulse 1.5s infinite alternate;
       }
       .nav-overlay {
         bottom: 15px;
         left: 15px;
+        right: 15px;
         width: auto;
         overflow-x: auto;
       }
@@ -404,7 +410,7 @@
   <div id="webgl-container"></div>
 
   <div id="ui-layer">
-    <!-- Header Utama -->
+    <!-- Header Utama (Kanan Atas) -->
     <div class="header-overlay">
       <h1>SIMULASI IKLIM BUMI 3D</h1>
       <p>Globe tetap berputar dengan penanda akurat & batas garis lintang negara.</p>
@@ -417,13 +423,13 @@
       <div class="blink-marker-label" id="marker-label">Indonesia</div>
     </div>
 
-    <!-- Panel Informasi Kanan -->
+    <!-- Panel Informasi (Sebelah Kiri) -->
     <div class="info-panel" id="info-panel">
       <div class="info-header">
         <div class="info-title" id="climate-name">Iklim Tropis</div>
         <div class="latitude-badge" id="climate-lat">Zona Lintang: 0° - 23,5° LU / LS</div>
         
-        <!-- Detail Info Rata Kanan Sejajar -->
+        <!-- Detail Info Rata Kiri -->
         <div class="country-coords-box" id="country-coords-box">
           <div class="info-row">
             <span class="label">Negara Terpilih</span>
@@ -445,7 +451,7 @@
       <div class="country-tags" id="climate-countries"></div>
     </div>
 
-    <!-- Navigation Bar (Teks Diubah Menjadi 'Dingin') -->
+    <!-- Navigation Bar -->
     <div class="nav-overlay">
       <button class="btn active" data-zone="tropis">Tropis</button>
       <button class="btn" data-zone="subtropis">Subtropis</button>
@@ -512,7 +518,7 @@
         ]
       },
       dingin: {
-        name: "Iklim Dingin", // Judul diganti menjadi 'Iklim Dingin'
+        name: "Iklim Dingin",
         lat: "Zona Lintang: 66,5° - 90° LU / LS",
         color: "#3b82f6",
         features: [
@@ -541,7 +547,7 @@
       scene = new THREE.Scene();
 
       camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-      camera.position.set(-2, 2, 16);
+      camera.position.set(2, 2, 16); // Geser tampilan kamera sedikit agar globe terpusat rapi dengan panel kiri
 
       renderer = new THREE.WebGLRenderer({ antialias: true });
       renderer.setSize(window.innerWidth, window.innerHeight);

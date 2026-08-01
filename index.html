@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulasi Iklim 3D - Presisi Garis Lintang Negara</title>
+  <style>
+    :root {
+      --bg-color: #030712;
+      --card-bg: rgba(15, 23, 42, 0.88);
+      --accent: #38bdf8;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text);
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    #webgl-container {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+
+    /* UI Overlay Layer */
+    #ui-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    /* Header Utama */
+    .header-overlay {
+      position: absolute;
+      top: 25px;
+      left: 30px;
+      pointer-events: auto;
+      background: var(--card-bg);
+      padding: 14px 22px;
+      border-radius: 8px;
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      box-shadow: 0 0 25px rgba(0,0,0,0.8);
+    }
+
+    .header-overlay h1 {
+      font-size: 1.05rem;
+      color: var(--accent);
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-transform: uppercase;
+    }
+
+    .header-overlay h1::before {
+      content: "";
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--accent);
+      animation: headerPulse 1.5s infinite alternate;
+    }
+
+    .header-overlay p {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Navigation Bar */
+    .nav-overlay {
+      position: absolute;
+      bottom: 25px;
+      left: 30px;
+      pointer-events: auto;
+      display: flex;
+      gap: 10px;
+      background: var(--card-bg);
+      padding: 8px 12px;
+      border-radius: 30px;
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    }
+
+    .btn {
+      background: rgba(51, 65, 85, 0.5);
+      color: var(--text);
+      border: 1px solid transparent;
+      padding: 8px 18px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.82rem;
+      letter-spacing: 0.5px;
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      background: rgba(71, 85, 105, 0.8);
+    }
+
+    .btn[data-zone="tropis"].active { border-color: #ef4444; background: rgba(239, 68, 68, 0.25); color: #fca5a5; box-shadow: 0 0 12px rgba(239, 68, 68, 0.4); }
+    .btn[data-zone="subtropis"].active { border-color: #f97316; background: rgba(249, 115, 22, 0.25); color: #fdba74; box-shadow: 0 0 12px rgba(249, 115, 22, 0.4); }
+    .btn[data-zone="sedang"].active { border-color: #eab308; background: rgba(234, 179, 8, 0.25); color: #fde047; box-shadow: 0 0 12px rgba(234, 179, 8, 0.4); }
+    .btn[data-zone="dingin"].active { border-color: #3b82f6; background: rgba(59, 130, 246, 0.25); color: #93c5fd; box-shadow: 0 0 12px rgba(59, 130, 246, 0.4); }
+
+    /* Panel Info Kanan */
+    .info-panel {
+      position: absolute;
+      right: 30px;
+      top: 25px;
+      width: 380px;
+      max-height: calc(100vh - 50px);
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      border-radius: 12px;
+      padding: 22px;
+      pointer-events: auto;
+      box-shadow: 0 0 35px rgba(0,0,0,0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-left: 4px solid var(--accent);
+      transition: border-color 0.4s ease;
+      overflow-y: auto;
+    }
+
+    .info-header {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+      padding-bottom: 14px;
+    }
+
+    .info-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
+    .latitude-badge {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+    }
+
+    /* Kotak Info Negara Diklik dengan Layout Rapi */
+    .country-coords-box {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px dashed rgba(56, 189, 248, 0.35);
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 0.82rem;
+    }
+
+    /* Grid layout agar titik dua (: ) tepat sejajar vertikal */
+    .info-row {
+      display: grid;
+      grid-template-columns: 135px 12px 1fr;
+      align-items: center;
+    }
+
+    .info-row .label {
+      color: var(--text-muted);
+    }
+
+    .info-row .colon {
+      color: var(--accent);
+      font-weight: bold;
+    }
+
+    .info-row .value {
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .section-title {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--text-muted);
+      margin-top: 16px;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .features-list {
+      list-style-type: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding-left: 0;
+    }
+
+    .features-list li {
+      font-size: 0.85rem;
+      line-height: 1.45;
+      color: #e2e8f0;
+      opacity: 0;
+      transform: translateX(12px);
+      transition: all 0.35s ease;
+    }
+
+    .features-list li.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* Interactive Country Buttons */
+    .country-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .country-tag {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 7px 14px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      color: #f1f5f9;
+      cursor: pointer;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: all 0.25s ease;
+      user-select: none;
+    }
+
+    .country-tag:hover {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .country-tag.active {
+      background: var(--accent);
+      color: #030712;
+      font-weight: 700;
+      border-color: var(--accent);
+      box-shadow: 0 0 12px var(--accent);
+    }
+
+    .country-tag.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Penanda Radar Berkedip */
+    .blink-marker-container {
+      position: absolute;
+      width: 0;
+      height: 0;
+      pointer-events: none;
+      z-index: 5;
+      transition: opacity 0.3s ease;
+    }
+
+    .blink-marker-pin {
+      width: 10px;
+      height: 10px;
+      background-color: var(--accent);
+      border-radius: 50%;
+      position: absolute;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 12px var(--accent);
+    }
+
+    .blink-marker-ring {
+      width: 36px;
+      height: 36px;
+      border: 2px solid var(--accent);
+      border-radius: 50%;
+      position: absolute;
+      transform: translate(-50%, -50%);
+      animation: radarPulse 1.6s infinite ease-out;
+    }
+
+    .blink-marker-label {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid var(--accent);
+      color: #fff;
+      padding: 3px 10px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      white-space: nowrap;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+      font-weight: 600;
+    }
+
+    @keyframes radarPulse {
+      0% {
+        width: 10px;
+        height: 10px;
+        opacity: 1;
+      }
+      100% {
+        width: 46px;
+        height: 46px;
+        opacity: 0;
+      }
+    }
+
+    @keyframes headerPulse {
+      from { opacity: 0.4; }
+      to { opacity: 1; }
+    }
+
+    @media (max-width: 768px) {
+      .info-panel {
+        top: auto;
+        bottom: 80px;
+        left: 15px;
+        right: 15px;
+        width: auto;
+        max-height: 40vh;
+      }
+      .header-overlay {
+        left: 15px;
+        right: 15px;
+        top: 15px;
+      }
+      .nav-overlay {
+        bottom: 15px;
+        left: 15px;
+        transform: none;
+        width: auto;
+        overflow-x: auto;
+      }
+    }
+  </style>
+
+  <!-- Three.js Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+
+  <div id="webgl-container"></div>
+
+  <div id="ui-layer">
+    <!-- Header -->
+    <div class="header-overlay">
+      <h1>SIMULASI IKLIM BUMI 3D</h1>
+      <p>Globe tetap berputar dengan penanda akurat & batas garis lintang negara.</p>
+    </div>
+
+    <!-- Element Penanda Radar Berkedip -->
+    <div id="blink-marker" class="blink-marker-container" style="opacity: 0;">
+      <div class="blink-marker-pin" id="marker-pin"></div>
+      <div class="blink-marker-ring" id="marker-ring"></div>
+      <div class="blink-marker-label" id="marker-label">Indonesia</div>
+    </div>
+
+    <!-- Panel Informasi Kanan -->
+    <div class="info-panel" id="info-panel">
+      <div class="info-header">
+        <div class="info-title" id="climate-name">Iklim Tropis</div>
+        <div class="latitude-badge" id="climate-lat">Zona Lintang: 0° - 23,5° LU / LS</div>
+        
+        <!-- Info Negara & Koordinat Lintang dengan Format Sejajar -->
+        <div class="country-coords-box" id="country-coords-box">
+          <div class="info-row">
+            <span class="label">Negara Terpilih</span>
+            <span class="colon">:</span>
+            <span class="value" id="selected-country-name">Indonesia</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Garis Lintang Akurat</span>
+            <span class="colon">:</span>
+            <span class="value" id="selected-country-lat">6° LU – 11° LS</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-title">KARAKTERISTIK IKLIM</div>
+      <ul class="features-list" id="climate-features"></ul>
+
+      <div class="section-title">PILIH NEGARA</div>
+      <div class="country-tags" id="climate-countries"></div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <div class="nav-overlay">
+      <button class="btn active" data-zone="tropis">Tropis</button>
+      <button class="btn" data-zone="subtropis">Subtropis</button>
+      <button class="btn" data-zone="sedang">Sedang</button>
+      <button class="btn" data-zone="dingin">Dingin / Kutub</button>
+    </div>
+  </div>
+
+  <script>
+    // Data Iklim & Batas Rentang Garis Lintang Astronomis Akurat Masing-Masing Negara
+    const climateData = {
+      tropis: {
+        name: "Iklim Tropis",
+        lat: "Zona Lintang: 0° - 23,5° LU / LS",
+        color: "#ef4444",
+        features: [
+          "Suhu udara hangat dan stabil sepanjang tahun berkisar 20°C hingga 30°C",
+          "Menerima intensitas sinar matahari secara maksimal",
+          "Curah hujan tinggi dan tingkat kelembapan udara konstan",
+          "Memiliki dua musim yaitu musim hujan dan musim kemarau"
+        ],
+        countries: [
+          { name: "Indonesia", lat: -2.5, lon: 118.0, latText: "6° LU – 11° LS" },
+          { name: "Brasil", lat: -14.2, lon: -51.9, latText: "5° LU – 34° LS" },
+          { name: "Nigeria", lat: 9.0, lon: 8.6, latText: "4° LU – 14° LU" },
+          { name: "Thailand", lat: 15.8, lon: 100.9, latText: "5° LU – 20° LU" },
+          { name: "Kolombia", lat: 4.5, lon: -74.2, latText: "12° LU – 4° LS" }
+        ]
+      },
+      subtropis: {
+        name: "Iklim Subtropis",
+        lat: "Zona Lintang: 23,5° - 35° LU / LS",
+        color: "#f97316",
+        features: [
+          "Merupakan zona transisi antara iklim tropis dan iklim sedang",
+          "Memiliki empat musim dengan musim panas hangat dan musim dingin sejuk",
+          "Banyak ditemukan daerah gurun pasir serta kawasan Mediterania",
+          "Tingkat curah hujan sedang dan bervariasi sepanjang tahun"
+        ],
+        countries: [
+          { name: "Mesir", lat: 26.8, lon: 30.8, latText: "22° LU – 31° LU" },
+          { name: "Jepang", lat: 36.2, lon: 138.2, latText: "24° LU – 46° LU" },
+          { name: "Maroko", lat: 31.7, lon: -7.0, latText: "21° LU – 36° LU" },
+          { name: "Australia", lat: -25.2, lon: 133.7, latText: "10° LS – 39° LS" },
+          { name: "Amerika Serikat", lat: 37.0, lon: -95.7, latText: "24° LU – 49° LU" }
+        ]
+      },
+      sedang: {
+        name: "Iklim Sedang",
+        lat: "Zona Lintang: 35° - 66,5° LU / LS",
+        color: "#eab308",
+        features: [
+          "Memiliki empat musim yaitu musim semi, panas, gugur, dan dingin",
+          "Perubahan suhu musiman terasa sangat signifikan",
+          "Terjadi fenomena hujan salju pada musim dingin",
+          "Dipengaruhi oleh pola pergerakan angin barat utama"
+        ],
+        countries: [
+          { name: "Jerman", lat: 51.1, lon: 10.4, latText: "47° LU – 55° LU" },
+          { name: "Inggris", lat: 55.3, lon: -3.4, latText: "50° LU – 61° LU" },
+          { name: "Prancis", lat: 46.2, lon: 2.2, latText: "41° LU – 51° LU" },
+          { name: "Korea Selatan", lat: 35.9, lon: 127.7, latText: "33° LU – 38° LU" },
+          { name: "Kanada", lat: 56.1, lon: -106.3, latText: "41° LU – 83° LU" }
+        ]
+      },
+      dingin: {
+        name: "Iklim Dingin / Kutub",
+        lat: "Zona Lintang: 66,5° - 90° LU / LS",
+        color: "#3b82f6",
+        features: [
+          "Suhu udara sangat dingin sepanjang tahun dan sering berada di bawah 0°C",
+          "Musim dingin berlangsung sangat panjang, gelap, dan ekstrem",
+          "Musim panas berlangsung sangat singkat dengan suhu yang tetap sejuk",
+          "Wilayah dominan tertutup lapisan es abadi atau vegetasi tundra"
+        ],
+        countries: [
+          { name: "Rusia", lat: 61.5, lon: 105.3, latText: "41° LU – 82° LU" },
+          { name: "Norwegia", lat: 60.4, lon: 8.4, latText: "57° LU – 71° LU" },
+          { name: "Finlandia", lat: 61.9, lon: 25.7, latText: "59° LU – 70° LU" },
+          { name: "Islandia", lat: 64.9, lon: -19.0, latText: "63° LU – 67° LU" },
+          { name: "Greenland", lat: 71.7, lon: -42.6, latText: "59° LU – 83° LU" }
+        ]
+      }
+    };
+
+    let scene, camera, renderer, controls, earthGroup;
+    let currentMarkerWorldPos = new THREE.Vector3();
+    const GLOBE_RADIUS = 5;
+
+    function init() {
+      const container = document.getElementById('webgl-container');
+
+      scene = new THREE.Scene();
+
+      camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.set(-2, 2, 16);
+
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(window.devicePixelRatio);
+      container.appendChild(renderer.domElement);
+
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+      controls.minDistance = 8;
+      controls.maxDistance = 22;
+
+      // Light
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.95);
+      scene.add(ambientLight);
+
+      const dirLight = new THREE.DirectionalLight(0xffffff, 0.45);
+      dirLight.position.set(10, 10, 10);
+      scene.add(dirLight);
+
+      earthGroup = new THREE.Group();
+      scene.add(earthGroup);
+
+      // Sphere Globe Utama (Polos Tanpa Blok Warna)
+      const textureLoader = new THREE.TextureLoader();
+      const earthTexture = textureLoader.load('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg');
+
+      const earthGeo = new THREE.SphereGeometry(GLOBE_RADIUS, 64, 64);
+      const earthMat = new THREE.MeshPhongMaterial({ map: earthTexture, shininess: 12 });
+      const earthMesh = new THREE.Mesh(earthGeo, earthMat);
+      earthGroup.add(earthMesh);
+
+      // Garis Lintang Utama + Label Derajat Pembatas Iklim
+      createLatitudeLineWithLabel(0, "0° Khatulistiwa");
+      createLatitudeLineWithLabel(23.5, "23.5° LU (Tropis)");
+      createLatitudeLineWithLabel(-23.5, "23.5° LS (Tropis)");
+      createLatitudeLineWithLabel(35, "35.0° LU (Subtropis)");
+      createLatitudeLineWithLabel(-35, "35.0° LS (Subtropis)");
+      createLatitudeLineWithLabel(66.5, "66.5° LU (Kutub)");
+      createLatitudeLineWithLabel(-66.5, "66.5° LS (Kutub)");
+
+      window.addEventListener('resize', onWindowResize);
+
+      // Listener Navigasi Iklim
+      document.querySelectorAll('.btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          selectZone(e.target.getAttribute('data-zone'));
+        });
+      });
+
+      // Default pilih Iklim Tropis
+      selectZone('tropis');
+
+      animate();
+    }
+
+    // Konversi Lat/Lon ke 3D Vector
+    function latLonToVector3(lat, lon, radius) {
+      const phi = (90 - lat) * (Math.PI / 180);
+      const theta = (lon + 180) * (Math.PI / 180);
+
+      const x = -(radius * Math.sin(phi) * Math.cos(theta));
+      const z = (radius * Math.sin(phi) * Math.sin(theta));
+      const y = (radius * Math.cos(phi));
+
+      return new THREE.Vector3(x, y, z);
+    }
+
+    // Canvas Label 2D untuk Teks 3D Garis Lintang
+    function createTextSprite(text) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 256;
+      canvas.height = 64;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(10, 10, 236, 44, 8);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.font = 'Bold 20px Segoe UI, sans-serif';
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(text, 128, 32);
+
+      const texture = new THREE.CanvasTexture(canvas);
+      const spriteMaterial = new THREE.SpriteMaterial({ map: texture, transparent: true });
+      const sprite = new THREE.Sprite(spriteMaterial);
+      sprite.scale.set(1.6, 0.4, 1);
+
+      return sprite;
+    }
+
+    // Garis Lintang + Tempelan Label Derajat di Globe
+    function createLatitudeLineWithLabel(latDeg, labelText) {
+      const phi = (90 - latDeg) * (Math.PI / 180);
+      const radiusAtLat = GLOBE_RADIUS * Math.sin(phi);
+      const yAtLat = GLOBE_RADIUS * Math.cos(phi);
+
+      const segments = 128;
+      const geometry = new THREE.BufferGeometry();
+      const positions = [];
+
+      for (let i = 0; i <= segments; i++) {
+        const theta = (i / segments) * Math.PI * 2;
+        positions.push(
+          radiusAtLat * Math.cos(theta),
+          yAtLat * 1.002,
+          radiusAtLat * Math.sin(theta)
+        );
+      }
+
+      geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+      const material = new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.5 });
+      earthGroup.add(new THREE.Line(geometry, material));
+
+      // Pasang Label di Sisi Depan dan Belakang Globe
+      const labelSprite1 = createTextSprite(labelText);
+      const pos1 = latLonToVector3(latDeg, 0, GLOBE_RADIUS * 1.02);
+      labelSprite1.position.copy(pos1);
+      earthGroup.add(labelSprite1);
+
+      const labelSprite2 = createTextSprite(labelText);
+      const pos2 = latLonToVector3(latDeg, 180, GLOBE_RADIUS * 1.02);
+      labelSprite2.position.copy(pos2);
+      earthGroup.add(labelSprite2);
+    }
+
+    // Penanda Berkedip Radar di Lokasi Negara
+    function setBlinkMarker(lat, lon, labelName, color) {
+      currentMarkerWorldPos = latLonToVector3(lat, lon, GLOBE_RADIUS);
+
+      const pin = document.getElementById('marker-pin');
+      const ring = document.getElementById('marker-ring');
+      const label = document.getElementById('marker-label');
+
+      pin.style.backgroundColor = color;
+      pin.style.boxShadow = `0 0 15px ${color}`;
+      ring.style.borderColor = color;
+      label.style.borderColor = color;
+      label.textContent = labelName;
+    }
+
+    function updateCountryDetails(countryName, latText, color) {
+      const nameEl = document.getElementById('selected-country-name');
+      const latEl = document.getElementById('selected-country-lat');
+
+      nameEl.textContent = countryName;
+      nameEl.style.color = color;
+      latEl.textContent = latText;
+    }
+
+    let activeTimeouts = [];
+    function renderInfoPanel(zoneKey, selectedCountryIndex = 0) {
+      const data = climateData[zoneKey];
+      if (!data) return;
+
+      activeTimeouts.forEach(t => clearTimeout(t));
+      activeTimeouts = [];
+
+      const infoPanel = document.getElementById('info-panel');
+      infoPanel.style.borderColor = data.color;
+
+      const titleEl = document.getElementById('climate-name');
+      titleEl.style.color = data.color;
+      titleEl.textContent = data.name;
+
+      const latEl = document.getElementById('climate-lat');
+      latEl.textContent = data.lat;
+
+      // Render Karakteristik
+      const featuresEl = document.getElementById('climate-features');
+      featuresEl.innerHTML = '';
+      data.features.forEach((feat, idx) => {
+        const li = document.createElement('li');
+        li.textContent = feat;
+        featuresEl.appendChild(li);
+
+        activeTimeouts.push(setTimeout(() => {
+          li.classList.add('visible');
+        }, 80 + idx * 100));
+      });
+
+      // Render Tombol-Tombol Negara Interaktif
+      const countriesEl = document.getElementById('climate-countries');
+      countriesEl.innerHTML = '';
+      data.countries.forEach((country, idx) => {
+        const tag = document.createElement('div');
+        tag.className = 'country-tag';
+        if (idx === selectedCountryIndex) tag.classList.add('active');
+        tag.textContent = country.name;
+
+        // Klik Negara -> Globe Tetap Berputar, Menampilkan Koordinat Lintang Akurat
+        tag.addEventListener('click', () => {
+          document.querySelectorAll('.country-tag').forEach(t => t.classList.remove('active'));
+          tag.classList.add('active');
+          
+          setBlinkMarker(country.lat, country.lon, country.name, data.color);
+          updateCountryDetails(country.name, country.latText, data.color);
+        });
+
+        countriesEl.appendChild(tag);
+
+        activeTimeouts.push(setTimeout(() => {
+          tag.classList.add('visible');
+        }, 350 + idx * 60));
+      });
+
+      // Set default negara pertama saat kategori diubah
+      const defaultCountry = data.countries[selectedCountryIndex];
+      setBlinkMarker(defaultCountry.lat, defaultCountry.lon, defaultCountry.name, data.color);
+      updateCountryDetails(defaultCountry.name, defaultCountry.latText, data.color);
+    }
+
+    function selectZone(zoneKey) {
+      document.querySelectorAll('.btn').forEach(btn => {
+        if (btn.getAttribute('data-zone') === zoneKey) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      renderInfoPanel(zoneKey, 0);
+    }
+
+    // Menyelaraskan Penanda Radar 2D dengan Globe 3D yang Berputar
+    function updateMarker2DPosition() {
+      const markerEl = document.getElementById('blink-marker');
+      if (!markerEl) return;
+
+      const tempV = new THREE.Vector3();
+      tempV.copy(currentMarkerWorldPos);
+      tempV.applyMatrix4(earthGroup.matrixWorld);
+
+      const distanceToCamera = tempV.distanceTo(camera.position);
+      const isBehind = distanceToCamera > 16.5;
+
+      tempV.project(camera);
+
+      const x = (tempV.x * .5 + .5) * window.innerWidth;
+      const y = (-(tempV.y * .5) + .5) * window.innerHeight;
+
+      markerEl.style.left = `${x}px`;
+      markerEl.style.top = `${y}px`;
+      markerEl.style.opacity = isBehind ? '0' : '1';
+    }
+
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      // Globe SELALU berputar konsisten
+      earthGroup.rotation.y += 0.0012;
+
+      controls.update();
+      updateMarker2DPosition();
+      renderer.render(scene, camera);
+    }
+
+    window.onload = init;
+  </script>
+</body>
+</html>
